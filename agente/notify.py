@@ -12,15 +12,12 @@ import requests
 
 log = logging.getLogger(__name__)
 
-EMOJI = {"IA": "🤖", "Mercado Tech": "📈", "Dev & Ferramentas": "🛠️", "Regulação": "⚖️",
-         "Pernambuco": "🦀", "Brasil": "🇧🇷"}
-
 
 def format_text(n: dict) -> str:
-    head = "🚨 URGENTE · " if n["urgente"] else ""
-    return (f"{head}{EMOJI.get(n['categoria'], '📰')} *{n['titulo_pt']}*\n\n"
-            f"{n['resumo']}\n\n💡 {n['por_que_importa']}\n\n"
-            f"📍 {n['source']} · nota {n['nota']}/10\n🔗 {n['url']}")
+    head = "URGENTE: " if n["urgente"] else ""
+    return (f"{head}{n['titulo_pt']}\n\n"
+            f"{n['resumo']}\n\n{n['por_que_importa']}\n\n"
+            f"Fonte: {n['source']}, nota {n['nota']}/10\n{n['url']}")
 
 
 def send_ntfy(n: dict) -> None:
@@ -30,12 +27,12 @@ def send_ntfy(n: dict) -> None:
     server = os.getenv("NTFY_SERVER", "https://ntfy.sh")
     body = {
         "topic": topic,
-        "title": f"{EMOJI.get(n['categoria'], '📰')} {n['titulo_pt']}"[:250],
-        "message": f"{n['resumo']}\n\n💡 {n['por_que_importa']}\n\n{n['source']} · {n['nota']}/10",
+        "title": n["titulo_pt"][:250],
+        "message": f"{n['resumo']}\n\n{n['por_que_importa']}\n\nFonte: {n['source']}, nota {n['nota']}/10",
         "click": n["url"],
         "priority": 5 if n["urgente"] else 4 if n["nota"] >= 8 else 3,
         "tags": [n["categoria"].lower().replace(" ", "-")],
-        "actions": [{"action": "view", "label": "Abrir notícia", "url": n["url"]}],
+        "actions": [{"action": "view", "label": "Abrir noticia", "url": n["url"]}],
     }
     r = requests.post(server, json=body, timeout=15)
     r.raise_for_status()
