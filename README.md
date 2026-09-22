@@ -1,9 +1,9 @@
 # Agente Tech 🤖📰
 
-Agente que vigia a internet a cada 5 minutos e te avisa **na hora** quando sai uma notícia de tecnologia que realmente importa: lançamentos de IA, grandes movimentos do mercado e o ecossistema de Pernambuco.
+Agente que vigia a internet a cada 3 horas e te avisa quando sai uma notícia de tecnologia que realmente importa: lançamentos de IA, grandes movimentos do mercado e o ecossistema de Pernambuco.
 
 ```
-GitHub Actions (a cada 5 min)
+GitHub Actions (a cada 3 horas)
    └─ coleta 15 fontes em paralelo (sites oficiais, RSS, Google News, Hacker News)
        └─ descarta o que já viu (state/seen.json) e o que tem mais de 18h
            └─ Claude Haiku dá nota 0-10, marca urgência/duplicata e resume em PT-BR
@@ -21,7 +21,7 @@ Crie uma API key em https://console.anthropic.com → *API Keys* e coloque algun
 
 ### 3. Repositório no GitHub
 1. Crie um repositório **público** e envie estes arquivos (`git init && git add . && git commit -m "agente" && git push`).
-   Em repositório público o GitHub Actions é ilimitado e grátis. Em privado, rodar a cada 5 min estoura os 2.000 min/mês gratuitos (se precisar ser privado, mude o cron para `*/30`). Os segredos ficam protegidos mesmo em repo público; o `state/seen.json` só guarda hashes.
+   Em repositório público o GitHub Actions é ilimitado e grátis. Com o cron de 3 em 3 horas (8 execuções/dia) o consumo de minutos é baixo mesmo em repositório privado. Os segredos ficam protegidos mesmo em repo público; o `state/seen.json` só guarda hashes.
 2. *Settings → Secrets and variables → Actions → New repository secret*:
    - `ANTHROPIC_API_KEY`: sua chave
    - `NTFY_TOPIC`: o nome do tópico do passo 1
@@ -62,6 +62,6 @@ O código já está pronto; só falta a configuração na Meta:
 ntfy e WhatsApp podem ficar ativos ao mesmo tempo; para desligar um canal, apague o secret dele.
 
 ## Custos e limites
-Com GitHub Actions público o custo de infraestrutura é zero. O Claude só é chamado quando aparece algo novo; a estimativa é de US$5–15/mês com Haiku, e dá para reduzir aumentando o intervalo do cron ou enxugando fontes do Google News. O WhatsApp cobra por conversa de template "utility" (centavos de real por mensagem no Brasil).
+Com GitHub Actions público o custo de infraestrutura é zero. O Claude só é chamado quando aparece algo novo; com o cron de 3 em 3 horas (8 execuções/dia) a estimativa fica bem abaixo de US$5/mês com Haiku. O WhatsApp cobra por conversa de template "marketing" (centavos de real por mensagem no Brasil).
 
-A latência típica entre a publicação e o alerta é de 5–15 minutos: o cron do GitHub pode atrasar em horários de pico e os feeds levam alguns minutos para atualizar. Para latência de ~1 minuto, o mesmo código roda num worker contínuo (Railway, VPS do CITi) com um loop `while True: run(); sleep(60)`.
+A latência típica entre a publicação e o alerta agora é de até 3 horas (o intervalo do cron), já que ele roda a cada 3 horas em vez de a cada poucos minutos. Pra voltar a um ciclo mais curto, edite `.github/workflows/agente.yml` e troque `0 */3 * * *` por algo mais frequente (ex. `*/30 * * * *` para 30 em 30 min); pra latência de ~1 minuto, o mesmo código roda num worker contínuo (Railway, VPS do CITi) com um loop `while True: run(); sleep(60)`.

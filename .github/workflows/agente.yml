@@ -2,7 +2,7 @@ name: Agente Tech
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # a cada 5 min (o GitHub pode atrasar alguns minutos em horários de pico)
+    - cron: "0 */3 * * *"   # a cada 3 horas (cheio; o GitHub pode atrasar alguns minutos)
   workflow_dispatch:
     inputs:
       test_notify:
