@@ -2,7 +2,7 @@ name: Agente Tech
 
 on:
   schedule:
-    - cron: "0 */3 * * *"   # a cada 3 horas (cheio; o GitHub pode atrasar alguns minutos)
+    - cron: "17 */3 * * *"   # a cada 3 horas, fora da hora cheia (17,20,23,02,05...) para evitar o horario de pico do agendador do GitHub
   workflow_dispatch:
     inputs:
       test_notify:
